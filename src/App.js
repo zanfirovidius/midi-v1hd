@@ -16,7 +16,31 @@ const cameraOptions = [
   { text: 'Server', value: 99 }
 ];
 
-var socket = io('localhost:8080');
+document.addEventListener(
+  'touchmove',
+  function(event) {
+    if (event.scale !== 1) {
+      event.preventDefault();
+    }
+  },
+  false
+);
+
+var lastTouchEnd = 0;
+document.addEventListener(
+  'touchend',
+  function(event) {
+    var now = new Date().getTime();
+    if (now - lastTouchEnd <= 300) {
+      event.preventDefault();
+    }
+    lastTouchEnd = now;
+  },
+  false
+);
+
+var socket = io('192.168.1.35:8080'); //change to machineIp
+// var socket = io('localhost:8080');
 
 class App extends Component {
   constructor(props) {
@@ -27,7 +51,8 @@ class App extends Component {
       buttonBankB: null,
       switch: null,
       camera: null,
-      messages: { buttonBank: null, select: null, switch: null }
+      messages: null
+      // messages: { buttonBank: null, select: null, switch: null }
     };
   }
 
@@ -162,10 +187,13 @@ class App extends Component {
               <Card.Description />
             </Card.Content>
           </Card>
-          <Button inverted color="yellow" onClick={() => this.sendMessage('test')}>
-            Yellow
-          </Button>
-          <p style={{ color: 'white' }}>{this.state.messages.message}</p>
+          {this.state.camera === 99 ? (
+            <Button inverted color="yellow" onClick={() => this.sendMessage('test2')}>
+              Yellow
+            </Button>
+          ) : null}
+
+          <p style={{ color: 'white' }}>{this.state.messages}</p>
         </div>
       </div>
     );
