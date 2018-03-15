@@ -1,0 +1,39 @@
+.container {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  background: #000;
+  height: 100vh;
+  width: 100vw;
+  justify-content: center;
+}
+
+.card {
+  max-width: 200px !important;
+}
+
+.big-button {
+  height: 200px;
+  width: 200px;
+  transition: background-color 200ms linear;
+}
+
+.big-button-red {
+  box-shadow: inset 0 0 30px #500000;
+}
+
+.big-button-green {
+  box-shadow: inset 0 0 30px #084a00;
+}
+
+.my-card {
+  transition: box-shadow 200ms linear;
+}
+
+.my-card-red {
+  box-shadow: 0 0 30px red !important;
+}
+
+.my-card-green {
+  box-shadow: 0 0 30px green !important;
+}
