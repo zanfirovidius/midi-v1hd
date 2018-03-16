@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 
-import WebMidi from 'webmidi';
 import io from 'socket.io-client';
 
-import { Button, Dropdown, Card } from 'semantic-ui-react';
+import { Dropdown, Card } from 'semantic-ui-react';
 
 const cameraOptions = [
   { text: 'Camera 1', value: 0 },
   { text: 'Camera 2', value: 1 },
   { text: 'Camera 3', value: 2 },
-  { text: 'Camera 4', value: 3 },
-  { text: 'Server', value: 99 }
+  { text: 'Camera 4', value: 3 }
 ];
 
 document.addEventListener(
@@ -40,7 +37,6 @@ document.addEventListener(
 );
 
 var socket = io('192.168.1.35:8080'); //change to machineIp
-// var socket = io('localhost:8080');
 
 class App extends Component {
   constructor(props) {
@@ -50,44 +46,34 @@ class App extends Component {
       buttonBankA: null,
       buttonBankB: null,
       switch: null,
-      camera: null,
-      messages: null
+      camera: null
     };
   }
 
   addMessage(e) {
-    if (this.state.camera !== 9999) {
-      // debugger;
-      console.log(e);
+    console.log(e);
 
-      if (e.type === 'controlchange') {
-        if (e.controller.name === 'generalpurposeslider2') {
-          this.setState({ switch: e.data[2] });
-        } else {
-          if (e.data[1] !== 32) {
-            if (e.data[2] === 0) {
-              this.setState({ bankA: e.data[2] });
-            } else {
-              this.setState({ bankB: e.data[2] });
-            }
-            this.setState({ select: e.data[2] });
+    if (e._type === 'cc') {
+      if (e.controller === 17) {
+        this.setState({ switch: e.value });
+      } else {
+        if (e.controller === 0) {
+          if (e.value === 0) {
+            this.setState({ bankA: e.value });
+          } else {
+            this.setState({ bankB: e.value });
           }
-        }
-      }
-
-      if (e.type === 'programchange') {
-        if (this.state.select === 0) {
-          this.setState({ buttonBankA: e.value });
-        } else {
-          this.setState({ buttonBankB: e.value });
+          this.setState({ select: e.value });
         }
       }
     }
-  }
 
-  sendMessage(e) {
-    if (this.state.camera === 99) {
-      socket.emit('SEND_MESSAGE', e);
+    if (e._type === 'program') {
+      if (this.state.select === 0) {
+        this.setState({ buttonBankA: e.number });
+      } else {
+        this.setState({ buttonBankB: e.number });
+      }
     }
   }
 
@@ -97,23 +83,6 @@ class App extends Component {
     socket.on('RECEIVE_MESSAGE', data => {
       this.addMessage(data);
     });
-
-    WebMidi.enable(err => {
-      if (err) {
-        console.log('WebMidi could not be enabled.', err);
-      } else {
-        console.log('WebMidi enabled!');
-        var input = WebMidi.inputs[0];
-        if (input) {
-          input.addListener('controlchange', 'all', e => {
-            this.sendMessage(e);
-          });
-          input.addListener('programchange', 'all', e => {
-            this.sendMessage(e);
-          });
-        }
-      }
-    }, true);
   }
 
   render() {
