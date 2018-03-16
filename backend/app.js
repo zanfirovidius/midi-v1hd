@@ -1,5 +1,6 @@
 var express = require('express');
 var socket = require('socket.io');
+var easymidi = require('easymidi');
 
 var app = express();
 
@@ -9,10 +10,11 @@ server = app.listen(8080, function() {
 
 io = socket(server);
 
-io.on('connection', socket => {
-  console.log(socket.id);
+var input = new easymidi.Input('V-1HD');
 
-  socket.on('SEND_MESSAGE', function(data) {
-    io.emit('RECEIVE_MESSAGE', data);
-  });
+input.addListener('cc', msg => {
+  io.emit('RECEIVE_MESSAGE', msg);
+});
+input.addListener('program', msg => {
+  io.emit('RECEIVE_MESSAGE', msg);
 });
