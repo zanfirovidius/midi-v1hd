@@ -52,27 +52,36 @@ class App extends Component {
       switch: null,
       camera: null,
       messages: null
-      // messages: { buttonBank: null, select: null, switch: null }
     };
   }
 
   addMessage(e) {
-    if (this.state.camera !== 99) {
+    if (this.state.camera !== 9999) {
+      // debugger;
       console.log(e);
-      this.setState({ messages: e });
-    } else {
-      // if (e.controller.name === 'generalpurposeslider2') {
-      //   this.setState({ switch: e.data[2] });
-      // } else {
-      //   if (e.data[1] !== 32) {
-      //     if (e.data[2] === 0) {
-      //       this.setState({ bankA: e.data[2] });
-      //     } else {
-      //       this.setState({ bankB: e.data[2] });
-      //     }
-      //     this.setState({ select: e.data[2] });
-      //   }
-      // }
+
+      if (e.type === 'controlchange') {
+        if (e.controller.name === 'generalpurposeslider2') {
+          this.setState({ switch: e.data[2] });
+        } else {
+          if (e.data[1] !== 32) {
+            if (e.data[2] === 0) {
+              this.setState({ bankA: e.data[2] });
+            } else {
+              this.setState({ bankB: e.data[2] });
+            }
+            this.setState({ select: e.data[2] });
+          }
+        }
+      }
+
+      if (e.type === 'programchange') {
+        if (this.state.select === 0) {
+          this.setState({ buttonBankA: e.value });
+        } else {
+          this.setState({ buttonBankB: e.value });
+        }
+      }
     }
   }
 
@@ -98,26 +107,9 @@ class App extends Component {
         if (input) {
           input.addListener('controlchange', 'all', e => {
             this.sendMessage(e);
-            // if (e.controller.name === 'generalpurposeslider2') {
-            //   this.setState({ switch: e.data[2] });
-            // } else {
-            //   if (e.data[1] !== 32) {
-            //     if (e.data[2] === 0) {
-            //       this.setState({ bankA: e.data[2] });
-            //     } else {
-            //       this.setState({ bankB: e.data[2] });
-            //     }
-            //     this.setState({ select: e.data[2] });
-            //   }
-            // }
           });
           input.addListener('programchange', 'all', e => {
             this.sendMessage(e);
-            // if (this.state.select === 0) {
-            //   this.setState({ buttonBankA: e.value });
-            // } else {
-            //   this.setState({ buttonBankB: e.value });
-            // }
           });
         }
       }
@@ -187,13 +179,6 @@ class App extends Component {
               <Card.Description />
             </Card.Content>
           </Card>
-          {this.state.camera === 99 ? (
-            <Button inverted color="yellow" onClick={() => this.sendMessage('test2')}>
-              Yellow
-            </Button>
-          ) : null}
-
-          <p style={{ color: 'white' }}>{this.state.messages}</p>
         </div>
       </div>
     );
